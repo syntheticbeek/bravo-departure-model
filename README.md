@@ -27,7 +27,8 @@ Removing the victim narrative variable collapses the gap by 58.9 points (nearly 
 
 Eight cases across four franchises with verified departure outcomes.
 
-<img width="623" height="382" alt="Screenshot 2026-05-10 at 8 04 57 PM" src="https://github.com/user-attachments/assets/7961ac92-4862-47f5-a59f-c9d3f881d4f6" />
+<img width="625" height="326" alt="Screenshot 2026-05-10 at 8 37 12 PM" src="https://github.com/user-attachments/assets/43ac4b0e-e855-414f-8ffa-095f952fc33b" />
+
 
 **Predictions: Summer House Season 11**
 
