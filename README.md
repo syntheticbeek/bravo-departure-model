@@ -33,7 +33,7 @@ Eight cases across four franchises with verified departure outcomes.
 
 **Ablation Analysis**
 
-To isolate what drives the 93.5 point gap, I retrained the model three times 
+To isolate what drives the 93.6 point gap (calculated from raw model output), I retrained the model three times 
 each time removing one variable.
 
 <img width="390" height="97" alt="Screenshot 2026-05-10 at 9 31 06 PM" src="https://github.com/user-attachments/assets/b2f6d817-9d63-4c94-9ab4-49a9d8ddaa20" />
