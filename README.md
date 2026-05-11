@@ -11,8 +11,12 @@ and applied it to predict outcomes for Amanda Batula and West Wilson following t
 **The Model Results**
 
 96.9% cast departure probability for Amanda Batula
+
+
 3.4% cast departure probability for West Wilson
-Same incident. Same show. Same season. 
+
+
+Same incident. Same show. Same season. 93.6 pt difference.
 
 **8 Variables Defined:**
 
