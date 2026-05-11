@@ -11,36 +11,33 @@ and applied it to predict outcomes for Amanda Batula and West Wilson following t
 **The Model Results**
 
 96.9% cast departure probability for Amanda Batula
-2.8% cast departure probability for West Wilson
-Same incident. Same show. Same season. 94.1 points apart.
-*(See Full write-up: syntheticbeek.substack.com)*
+3.4% cast departure probability for West Wilson
+Same incident. Same show. Same season. 
 
 **8 Variables Defined:**
 
 <img width="630" height="521" alt="Screenshot 2026-05-10 at 7 56 44 PM" src="https://github.com/user-attachments/assets/101cb84e-ae45-4119-b95d-526c68645cd9" />
 
-Removing gender changes almost nothing (−0.1 pts). 
-Removing the betrayal index reduces the gap by 11.4 points. 
-Removing the victim narrative variable collapses the gap by 58.9 points (nearly two thirds of the model's total predictive power).
 
 **Training Data**
 
 Eight cases across four franchises with verified departure outcomes.
 
-<img width="625" height="326" alt="Screenshot 2026-05-10 at 8 37 12 PM" src="https://github.com/user-attachments/assets/43ac4b0e-e855-414f-8ffa-095f952fc33b" />
+<img width="454" height="389" alt="Screenshot 2026-05-10 at 9 28 38 PM" src="https://github.com/user-attachments/assets/0e768ad3-bbba-4040-8edd-93bd7758ec00" />
 
 
 **Predictions: Summer House Season 11**
 
-<img width="632" height="111" alt="Screenshot 2026-05-10 at 7 57 46 PM" src="https://github.com/user-attachments/assets/a25331a1-d48c-4c64-84fa-1d3837fb5d4a" />
+<img width="315" height="82" alt="Screenshot 2026-05-10 at 9 30 29 PM" src="https://github.com/user-attachments/assets/7f68f0bf-0e79-405a-9313-1d0a7e2455ce" />
 
 
 **Ablation Analysis**
 
-To isolate what drives the 94.1-point gap, I retrained the model three times 
+To isolate what drives the 93.6 point gap, I retrained the model three times 
 each time removing one variable.
 
-<img width="340" height="165" alt="Screenshot 2026-05-10 at 8 06 04 PM" src="https://github.com/user-attachments/assets/0368984a-eb18-4483-875b-5becd387de7e" />
+<img width="390" height="97" alt="Screenshot 2026-05-10 at 9 31 06 PM" src="https://github.com/user-attachments/assets/b2f6d817-9d63-4c94-9ab4-49a9d8ddaa20" />
+
 
 
 
