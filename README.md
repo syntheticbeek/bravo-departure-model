@@ -55,7 +55,7 @@ before the cast members negative reputation incident occurs- this is the primary
 **Score a New Cast Member**
 
 Want to apply the model to a different franchise or cast member? 
-Clone the repo and edit the scoring inputs in bravo_departure_model.ipynb. Each variable is documented inline.
+Clone the repo and edit the scoring inputs in BRAVO_CASTMATE_DEPARTURE.ipyb . Each variable is documented inline.
 
 
 **Methodology**
