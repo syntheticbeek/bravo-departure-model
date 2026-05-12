@@ -62,6 +62,6 @@ Clone the repo and edit the scoring inputs in BRAVO_CASTMATE_DEPARTURE.ipynb . E
 
 Logistic regression trained on 8 verified cases. 
 Franchises selected for documented scandal involvement and confirmed departure outcomes (RHOBH, VPR, Southern Charm, Summer House). 
-Model validated by correct classification of all training cases before being applied to Summer House Season 11 predictions.
+Before predicting Amanda and West, the model was run against all eight training cases. 
 
 Want more info? Check out my substack: (https://syntheticbeek.substack.com/p/i-built-a-model-to-predict-bravo)
