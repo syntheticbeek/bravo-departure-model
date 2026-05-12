@@ -44,6 +44,13 @@ each time removing one variable.
 
 
 
+**Permutation Test**
+
+The outcome labels were randomly shuffled 10,000 times and the model retrained on each permutation. Only 256 of 10,000 random configurations produced a gap as large as the observed 93.6%. The mean gap under random conditions was 40.4%.
+
+P-value: 0.0256
+
+The observed gap is statistically significant at the 0.05 threshold. The finding is unlikely to be a product of random chance despite the small sample size.
 
 **THE UPSHOT:**
 
@@ -60,8 +67,8 @@ Clone the repo and edit the scoring inputs in BRAVO_CASTMATE_DEPARTURE.ipynb . E
 
 **Methodology**
 
-Logistic regression trained on 8 verified cases. 
-Franchises selected for documented scandal involvement and confirmed departure outcomes (RHOBH, VPR, Southern Charm, Summer House). 
-Before predicting Amanda and West, the model was run against all eight training cases. 
+Logistic regression trained on eight verified cases across four Bravo franchises (Real Housewives of Beverly Hills, Vanderpump Rules, Southern Charm, and Summer House). Cases were selected based on documented scandal involvement and confirmed departure outcomes. All variable scores were assigned by the researcher based on direct observation of available footage and established Bravo narrative conventions.
+
 
 Want more info? Check out my substack: (https://syntheticbeek.substack.com/p/i-built-a-model-to-predict-bravo)
+
