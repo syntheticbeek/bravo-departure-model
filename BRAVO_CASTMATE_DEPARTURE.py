@@ -1,191 +1,393 @@
-import pandas as pd
-import numpy as np
-from sklearn.linear_model import LogisticRegression
-from sklearn.preprocessing import LabelEncoder
-import warnings
-warnings.filterwarnings('ignore')
-
-# Build your training dataset
-data = {
-    'cast_member': [
-        'Denise Richards', 'Raquel Leviss', 'Olivia Flowers',
-        'Taylor Ann Green', 'Kyle Richards',
-        'Tom Sandoval', 'Austen Kroll', 'Whitney Sudler-Smith'
-    ],
-    'show': [
-        'RHOBH', 'VPR', 'Southern Charm',
-        'Southern Charm', 'RHOBH',
-        'VPR', 'Southern Charm', 'Southern Charm'
-    ],
-    'trigger_timing': [
-        'mid', 'late', 'early',
-        'early', 'early',
-        'late', 'early', 'mid'
-    ],
-    'confirmed': [0, 0, 1, 0, 0, 1, 0, 0],
-    'cast_reaction': [2, 2, 1, 2, 1, 2, 1, 1],
-    'betrayal_index': [8, 10, 6.5, 8, 5, 10, 7, 6],
-    'narrative_equity': [7, 7, 7, 8, 10, 10, 8, 5],
-    'victim_narrative_index': [8, 8, 7, 9, 8, 1, 1, 3],
-    'prior_incident': [0, 0, 1, 0, 0, 1, 1, 0],
-    'gender': [0, 0, 0, 0, 0, 1, 1, 1],
-    'outcome': [1, 1, 1, 1, 0, 0, 0, 0]
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyMHeKss6Dr7Eck5j48xihx5",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/syntheticbeek/bravo-departure-model/blob/main/BRAVO_CASTMATE_DEPARTURE.py\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pandas as pd\n",
+        "import numpy as np\n",
+        "from sklearn.linear_model import LogisticRegression\n",
+        "import warnings\n",
+        "warnings.filterwarnings('ignore')\n",
+        "\n",
+        "# Build your training dataset\n",
+        "data = {\n",
+        "    'cast_member': [\n",
+        "        'Denise Richards', 'Raquel Leviss', 'Olivia Flowers',\n",
+        "        'Taylor Ann Green', 'Kyle Richards',\n",
+        "        'Tom Sandoval', 'Austen Kroll', 'Whitney Sudler-Smith'\n",
+        "    ],\n",
+        "    'show': [\n",
+        "        'RHOBH', 'VPR', 'Southern Charm',\n",
+        "        'Southern Charm', 'RHOBH',\n",
+        "        'VPR', 'Southern Charm', 'Southern Charm'\n",
+        "    ],\n",
+        "    'trigger_timing': [\n",
+        "        'mid', 'late', 'early',\n",
+        "        'early', 'early',\n",
+        "        'late', 'early', 'mid'\n",
+        "    ],\n",
+        "    'confirmed': [0, 0, 1, 0, 0, 1, 0, 0],\n",
+        "    'cast_reaction': [2, 2, 1, 2, 1, 2, 1, 1],\n",
+        "    'betrayal_index': [8, 10, 6.5, 8, 5, 10, 7, 6],\n",
+        "    'narrative_equity': [7, 7, 7, 8, 10, 10, 8, 5],\n",
+        "    'victim_narrative_index': [8, 8, 7, 9, 8, 1, 1, 3],\n",
+        "    'prior_incident': [0, 0, 1, 0, 0, 1, 1, 0],\n",
+        "    'gender': [0, 0, 0, 0, 0, 1, 1, 1],\n",
+        "    'outcome': [1, 1, 1, 1, 0, 0, 0, 0]\n",
+        "}\n",
+        "\n",
+        "df = pd.DataFrame(data)\n",
+        "\n",
+        "timing_map = {'early': 0, 'mid': 1, 'late': 2, 'after_filming': 3}\n",
+        "df['trigger_timing_encoded'] = df['trigger_timing'].map(timing_map)\n",
+        "\n",
+        "print(df[['cast_member', 'gender', 'betrayal_index', 'victim_narrative_index', 'outcome']])\n",
+        "\n",
+        "features = ['trigger_timing_encoded', 'confirmed', 'cast_reaction',\n",
+        "            'betrayal_index', 'narrative_equity', 'victim_narrative_index',\n",
+        "            'prior_incident', 'gender']\n",
+        "\n",
+        "X_train = df[features]\n",
+        "y_train = df['outcome']\n",
+        "\n",
+        "# Train the model with random state for reproducibility\n",
+        "model = LogisticRegression(random_state=42)\n",
+        "model.fit(X_train, y_train)\n",
+        "\n",
+        "print(\"\\n--- Variable Weights ---\")\n",
+        "weights = pd.DataFrame({\n",
+        "    'Variable': features,\n",
+        "    'Weight': model.coef_[0]\n",
+        "}).sort_values('Weight', ascending=False)\n",
+        "print(weights.to_string(index=False))\n",
+        "\n",
+        "# Amanda and West — West prior_incident = 1 (Ciara breakup)\n",
+        "test_data = {\n",
+        "    'cast_member': ['Amanda', 'West'],\n",
+        "    'trigger_timing_encoded': [3, 3],\n",
+        "    'confirmed': [0, 0],\n",
+        "    'cast_reaction': [2, 2],\n",
+        "    'betrayal_index': [10, 6],\n",
+        "    'narrative_equity': [10, 8],\n",
+        "    'victim_narrative_index': [10, 3],\n",
+        "    'prior_incident': [0, 1],\n",
+        "    'gender': [0, 1]\n",
+        "}\n",
+        "\n",
+        "test_df = pd.DataFrame(test_data)\n",
+        "predictions = model.predict_proba(test_df[features])\n",
+        "\n",
+        "print(\"\\n--- Predictions ---\")\n",
+        "for i, name in enumerate(['Amanda', 'West']):\n",
+        "    print(f\"{name} — Exit probability: {predictions[i][1]:.1%}\")\n",
+        "\n",
+        "# Without victim narrative\n",
+        "features_no_victim = ['trigger_timing_encoded', 'confirmed', 'cast_reaction',\n",
+        "                      'betrayal_index', 'narrative_equity',\n",
+        "                      'prior_incident', 'gender']\n",
+        "\n",
+        "model_no_victim = LogisticRegression(random_state=42)\n",
+        "model_no_victim.fit(df[features_no_victim], df['outcome'])\n",
+        "\n",
+        "test_no_victim = pd.DataFrame([{\n",
+        "    'trigger_timing_encoded': 3,\n",
+        "    'confirmed': 0,\n",
+        "    'cast_reaction': 2,\n",
+        "    'betrayal_index': 10,\n",
+        "    'narrative_equity': 10,\n",
+        "    'prior_incident': 0,\n",
+        "    'gender': 0\n",
+        "},\n",
+        "{\n",
+        "    'trigger_timing_encoded': 3,\n",
+        "    'confirmed': 0,\n",
+        "    'cast_reaction': 2,\n",
+        "    'betrayal_index': 6,\n",
+        "    'narrative_equity': 8,\n",
+        "    'prior_incident': 1,\n",
+        "    'gender': 1\n",
+        "}])\n",
+        "\n",
+        "preds_no_victim = model_no_victim.predict_proba(test_no_victim[features_no_victim])\n",
+        "\n",
+        "print(\"\\n--- Without Victim Narrative Variable ---\")\n",
+        "for i, name in enumerate(['Amanda', 'West']):\n",
+        "    print(f\"{name} — Exit probability: {preds_no_victim[i][1]:.1%}\")\n",
+        "print(f\"Gap without victim narrative: {abs(preds_no_victim[0][1] - preds_no_victim[1][1]):.1%}\")\n",
+        "\n",
+        "# Without betrayal index\n",
+        "features_no_betrayal = ['trigger_timing_encoded', 'confirmed', 'cast_reaction',\n",
+        "                        'narrative_equity', 'victim_narrative_index',\n",
+        "                        'prior_incident', 'gender']\n",
+        "\n",
+        "model_no_betrayal = LogisticRegression(random_state=42)\n",
+        "model_no_betrayal.fit(df[features_no_betrayal], df['outcome'])\n",
+        "\n",
+        "test_no_betrayal = pd.DataFrame([{\n",
+        "    'trigger_timing_encoded': 3,\n",
+        "    'confirmed': 0,\n",
+        "    'cast_reaction': 2,\n",
+        "    'narrative_equity': 10,\n",
+        "    'victim_narrative_index': 10,\n",
+        "    'prior_incident': 0,\n",
+        "    'gender': 0\n",
+        "},\n",
+        "{\n",
+        "    'trigger_timing_encoded': 3,\n",
+        "    'confirmed': 0,\n",
+        "    'cast_reaction': 2,\n",
+        "    'narrative_equity': 8,\n",
+        "    'victim_narrative_index': 3,\n",
+        "    'prior_incident': 1,\n",
+        "    'gender': 1\n",
+        "}])\n",
+        "\n",
+        "preds_no_betrayal = model_no_betrayal.predict_proba(test_no_betrayal[features_no_betrayal])\n",
+        "\n",
+        "print(\"\\n--- Without Betrayal Index Variable ---\")\n",
+        "for i, name in enumerate(['Amanda', 'West']):\n",
+        "    print(f\"{name} — Exit probability: {preds_no_betrayal[i][1]:.1%}\")\n",
+        "print(f\"Gap without betrayal index: {abs(preds_no_betrayal[0][1] - preds_no_betrayal[1][1]):.1%}\")\n",
+        "\n",
+        "# Without gender\n",
+        "features_no_gender = ['trigger_timing_encoded', 'confirmed', 'cast_reaction',\n",
+        "                      'betrayal_index', 'narrative_equity', 'victim_narrative_index',\n",
+        "                      'prior_incident']\n",
+        "\n",
+        "model_no_gender = LogisticRegression(random_state=42)\n",
+        "model_no_gender.fit(df[features_no_gender], df['outcome'])\n",
+        "\n",
+        "test_no_gender = pd.DataFrame([{\n",
+        "    'trigger_timing_encoded': 3,\n",
+        "    'confirmed': 0,\n",
+        "    'cast_reaction': 2,\n",
+        "    'betrayal_index': 10,\n",
+        "    'narrative_equity': 10,\n",
+        "    'victim_narrative_index': 10,\n",
+        "    'prior_incident': 0\n",
+        "},\n",
+        "{\n",
+        "    'trigger_timing_encoded': 3,\n",
+        "    'confirmed': 0,\n",
+        "    'cast_reaction': 2,\n",
+        "    'betrayal_index': 6,\n",
+        "    'narrative_equity': 8,\n",
+        "    'victim_narrative_index': 3,\n",
+        "    'prior_incident': 1\n",
+        "}])\n",
+        "\n",
+        "preds_no_gender = model_no_gender.predict_proba(test_no_gender[features_no_gender])\n",
+        "\n",
+        "print(\"\\n--- Without Gender Variable ---\")\n",
+        "for i, name in enumerate(['Amanda', 'West']):\n",
+        "    print(f\"{name} — Exit probability: {preds_no_gender[i][1]:.1%}\")\n",
+        "print(f\"Gap without gender: {abs(preds_no_gender[0][1] - preds_no_gender[1][1]):.1%}\")\n",
+        "\n",
+        "# Summary — all calculated dynamically\n",
+        "full_gap = abs(predictions[0][1] - predictions[1][1])\n",
+        "gender_gap = abs(preds_no_gender[0][1] - preds_no_gender[1][1])\n",
+        "betrayal_gap = abs(preds_no_betrayal[0][1] - preds_no_betrayal[1][1])\n",
+        "victim_gap = abs(preds_no_victim[0][1] - preds_no_victim[1][1])\n",
+        "\n",
+        "print(f\"\\n--- Summary: Gap Under Each Condition ---\")\n",
+        "print(f\"Full model (all variables):     {full_gap:.1%}\")\n",
+        "print(f\"Without gender:                 {gender_gap:.1%}\")\n",
+        "print(f\"Without betrayal index:         {betrayal_gap:.1%}\")\n",
+        "print(f\"Without victim narrative:       {victim_gap:.1%}\")"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "1ll2LtU8zQ--",
+        "outputId": "3db1e77b-863d-402f-aaf8-98fd7a756f3f"
+      },
+      "execution_count": 12,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "            cast_member  gender  betrayal_index  victim_narrative_index  \\\n",
+            "0       Denise Richards       0             8.0                       8   \n",
+            "1         Raquel Leviss       0            10.0                       8   \n",
+            "2        Olivia Flowers       0             6.5                       7   \n",
+            "3      Taylor Ann Green       0             8.0                       9   \n",
+            "4         Kyle Richards       0             5.0                       8   \n",
+            "5          Tom Sandoval       1            10.0                       1   \n",
+            "6          Austen Kroll       1             7.0                       1   \n",
+            "7  Whitney Sudler-Smith       1             6.0                       3   \n",
+            "\n",
+            "   outcome  \n",
+            "0        1  \n",
+            "1        1  \n",
+            "2        1  \n",
+            "3        1  \n",
+            "4        0  \n",
+            "5        0  \n",
+            "6        0  \n",
+            "7        0  \n",
+            "\n",
+            "--- Variable Weights ---\n",
+            "              Variable    Weight\n",
+            "victim_narrative_index  0.785028\n",
+            "        betrayal_index  0.610436\n",
+            "             confirmed  0.218178\n",
+            "        prior_incident  0.204283\n",
+            "         cast_reaction  0.133845\n",
+            "trigger_timing_encoded -0.062521\n",
+            "                gender -0.175714\n",
+            "      narrative_equity -0.547053\n",
+            "\n",
+            "--- Predictions ---\n",
+            "Amanda — Exit probability: 96.9%\n",
+            "West — Exit probability: 3.4%\n",
+            "\n",
+            "--- Without Victim Narrative Variable ---\n",
+            "Amanda — Exit probability: 43.8%\n",
+            "West — Exit probability: 7.5%\n",
+            "Gap without victim narrative: 36.3%\n",
+            "\n",
+            "--- Without Betrayal Index Variable ---\n",
+            "Amanda — Exit probability: 87.9%\n",
+            "West — Exit probability: 6.4%\n",
+            "Gap without betrayal index: 81.4%\n",
+            "\n",
+            "--- Without Gender Variable ---\n",
+            "Amanda — Exit probability: 97.0%\n",
+            "West — Exit probability: 3.5%\n",
+            "Gap without gender: 93.5%\n",
+            "\n",
+            "--- Summary: Gap Under Each Condition ---\n",
+            "Full model (all variables):     93.6%\n",
+            "Without gender:                 93.5%\n",
+            "Without betrayal index:         81.4%\n",
+            "Without victim narrative:       36.3%\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import numpy as np\n",
+        "import matplotlib.pyplot as plt\n",
+        "\n",
+        "print(\"\\n--- Permutation Test: Could the gap occur by chance? ---\")\n",
+        "\n",
+        "# Observed gap\n",
+        "observed_gap = abs(predictions[0][1] - predictions[1][1])\n",
+        "print(f\"Observed gap: {observed_gap:.1%}\")\n",
+        "\n",
+        "# Run 10000 permutations\n",
+        "n_permutations = 10000\n",
+        "permutation_gaps = []\n",
+        "\n",
+        "for seed in range(n_permutations):\n",
+        "    rng = np.random.RandomState(seed)\n",
+        "    y_permuted = rng.permutation(y_train)\n",
+        "\n",
+        "    # Skip if only one class\n",
+        "    if len(np.unique(y_permuted)) < 2:\n",
+        "        continue\n",
+        "\n",
+        "    m = LogisticRegression(random_state=42, max_iter=1000)\n",
+        "    m.fit(X_train, y_permuted)\n",
+        "    p = m.predict_proba(test_df[features])\n",
+        "    permutation_gaps.append(abs(p[0][1] - p[1][1]))\n",
+        "\n",
+        "permutation_gaps = np.array(permutation_gaps)\n",
+        "\n",
+        "# P-value: proportion of permutations that produced a gap >= observed\n",
+        "p_value = (permutation_gaps >= observed_gap).mean()\n",
+        "\n",
+        "print(f\"Permutations completed: {len(permutation_gaps)}/{n_permutations}\")\n",
+        "print(f\"Mean permutation gap: {permutation_gaps.mean():.1%}\")\n",
+        "print(f\"Max permutation gap: {permutation_gaps.max():.1%}\")\n",
+        "print(f\"Permutations >= observed gap: {(permutation_gaps >= observed_gap).sum()}\")\n",
+        "print(f\"P-value: {p_value:.4f}\")\n",
+        "\n",
+        "if p_value < 0.05:\n",
+        "    print(f\"\\nResult: SIGNIFICANT — the observed gap is unlikely to occur by chance (p={p_value:.4f})\")\n",
+        "elif p_value < 0.10:\n",
+        "    print(f\"\\nResult: MARGINAL — borderline significance (p={p_value:.4f})\")\n",
+        "else:\n",
+        "    print(f\"\\nResult: NOT SIGNIFICANT — the gap could occur by chance (p={p_value:.4f})\")\n",
+        "\n",
+        "# Visualize\n",
+        "fig, ax = plt.subplots(figsize=(10, 5))\n",
+        "ax.hist(permutation_gaps * 100, bins=50, color='#B4B2A9', alpha=0.8, label='Permutation gaps')\n",
+        "ax.axvline(observed_gap * 100, color='#A32D2D', linewidth=2.5, label=f'Observed gap ({observed_gap:.1%})')\n",
+        "ax.set_xlabel('Gap (%)')\n",
+        "ax.set_ylabel('Frequency')\n",
+        "ax.set_title('Permutation Test: Observed Gap vs Random Chance')\n",
+        "ax.legend()\n",
+        "plt.tight_layout()\n",
+        "plt.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 677
+        },
+        "id": "_Ia25tKY5PuS",
+        "outputId": "be260ea9-2a60-4871-f651-45fa228e850b"
+      },
+      "execution_count": 11,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "\n",
+            "--- Permutation Test: Could the gap occur by chance? ---\n",
+            "Observed gap: 93.6%\n",
+            "Permutations completed: 10000/10000\n",
+            "Mean permutation gap: 40.4%\n",
+            "Max permutation gap: 93.6%\n",
+            "Permutations >= observed gap: 256\n",
+            "P-value: 0.0256\n",
+            "\n",
+            "Result: SIGNIFICANT — the observed gap is unlikely to occur by chance (p=0.0256)\n"
+          ]
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "<Figure size 1000x500 with 1 Axes>"
+            ],
+            "image/png": "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0ejfv79RqlQpw8XFxShTpozxxhtvGMnJyWYfjl/kdnaGYRg5GfoBAAAAAMivuKYbAAAAAACLELoBAAAAALAIoRsAAAAAAIsQugEAAAAAsAihGwAAAAAAixC6AQAAAACwCKEbAAAAAACLELoBAAAAALAIoRsAAGSbjz76SM2bN7+nZcyZM0dt27bNpooAAMhZhG4AAPKJ2NhY9e/fX+XKlZOLi4v8/PwUGhqq2bNn6/Lly5av/8qVKxo6dKiGDx9utq1atUrly5eXp6ennn76aV29etWclpCQoPLly+v48eM2y3nmmWe0a9cu/fTTT5bXDACA1QjdAADkA3/88Ydq1qyplStX6q233tLu3bu1efNmvfLKK/r222+1evVqy2v4/PPP5enpqdDQUElSWlqannzyST3//PPavHmzduzYoffff9/s/9prr+n5559XYGCgzXKcnJz05JNPatq0aZbXDACA1QjdAADkA3369JGjo6N27NihTp06qWLFiipTpozatWun7777zma49uTJk1W1alW5u7urZMmS6tOnj5KSkszp0dHR8vb21ldffaXg4GC5uLgoPDxcJ06cuG0NCxcutFnP2bNndfbsWfXp00eVK1fWo48+qoMHD0qSfv75Z23fvl39+/fPdFlt27bVsmXL9M8//9zLbgEAIMcRugEAyOPOnTunlStXqm/fvnJ3d8+0j52dnflve3t7TZs2Tfv379fcuXO1du1avfLKKzb9L1++rLFjx2revHnatGmT4uPj1aVLl9vWsXHjRtWuXdt8X7RoURUrVkwrV67U5cuX9dNPP6latWq6du2aXnjhBb333ntycHDIdFm1a9dWSkqKtm7deqe7AQCAXInQDQBAHvf777/LMAxVqFDBpr1IkSLy8PCQh4eHXn31VbN9wIABeuSRR1S6dGk1adJEY8aM0eLFi23mvXbtmmbMmKH69eurVq1amjt3rn7++Wdt27Yt0xri4+OVkJCggIAAs83Ozk6LFy/W6NGjVblyZdWsWVPPPPOM3n77bT3yyCNycXFRaGioKlSooBkzZtgsz83NTV5eXhmu9wYAIK9xzOkCAACANbZt26a0tDRFREQoOTnZbF+9erXGjRun3377TYmJiUpJSdGVK1d0+fJlubm5SZIcHR1Vp04dc56QkBB5e3vr4MGDqlu3boZ1pQ8Dd3FxsWlv0KCBtm/fbr4/fPiw5s2bp927d6tRo0bq37+/WrZsqSpVqqhRo0aqVq2a2dfV1fU/uQEcAABW4kw3AAB5XLly5WRnZ6dDhw7ZtJcpU0blypWTq6ur2fbnn3+qTZs2qlatmr744gvt3LlTM2fOlCSbO4vfLR8fH9nZ2enChQu37ffcc89p0qRJSktL0+7du9WxY0f5+vqqcePGWr9+vU3f8+fPq2jRolmuCQCA3IDQDQBAHufj46NmzZppxowZunTp0m377ty5U2lpaZo0aZIefPBBlS9fXidPnszQLyUlRTt27DDfHzp0SPHx8apYsWKmy3VyclKlSpV04MCBW677o48+UuHChfXoo48qNTVV0vVh7On/TW+TpKNHj+rKlSuqWbPmbbcHAIDcjtANAEA+MGvWLKWkpKh27dpatGiRDh48qEOHDunTTz/Vb7/9Zt6wrFy5crp27ZqmT5+uP/74Q5988onmzJmTYXkFChRQv379tHXrVu3cuVPdu3fXgw8+mOnQ8nTh4eHauHFjptPi4uI0ZswYTZ8+XZJUqFAhVaxYUVOnTtXmzZu1Zs0a81FjkvTTTz+pTJkyKlu27L3sFgAAchyhGwCAfKBs2bLavXu3wsLCNGTIEFWvXl21a9fW9OnTNXjwYI0ePVqSVL16dU2ePFnjx49XlSpVNH/+fI0bNy7D8tzc3PTqq6/qySefVGhoqDw8PLRo0aLb1tCzZ099//33SkhIyDCtf//+eumll2xutBYdHa2FCxeqTZs2evnll22uIV+wYIF69+6d1d0BAECuYWcYhpHTRQAAgNwjOjpaAwYMUHx8/F3P27FjRz3wwAMaMmRIlte/f/9+NWnSRIcPH5aXl1eWlwMAQG7AmW4AAJBt3nnnHXl4eNzTMk6dOqV58+YRuAEA+QKPDAMAANmmdOnS6tev3z0tIywsLJuqAQAg5zG8HAAAAAAAizC8HAAAAAAAixC6AQAAAACwCKEbAAAAAACLELoBAAAAALAIoRsAAAAAAIsQugEAAAAAsAihGwAAAAAAixC6AQAAAACwCKEbAAAAAACL/D+PhxJyp9iJLQAAAABJRU5ErkJggg==\n"
+          },
+          "metadata": {}
+        }
+      ]
+    }
+  ]
 }
-
-df = pd.DataFrame(data)
-
-# Encode trigger timing
-timing_map = {'early': 0, 'mid': 1, 'late': 2, 'after_filming': 3}
-df['trigger_timing_encoded'] = df['trigger_timing'].map(timing_map)
-
-print(df[['cast_member', 'gender', 'betrayal_index', 'victim_narrative_index', 'outcome']])
-
-# Features for training
-features = ['trigger_timing_encoded', 'confirmed', 'cast_reaction',
-            'betrayal_index', 'narrative_equity', 'victim_narrative_index',
-            'prior_incident', 'gender']
-
-X_train = df[features]
-y_train = df['outcome']
-
-# Train the model
-model = LogisticRegression()
-model.fit(X_train, y_train)
-
-# Print model weights
-print("\n--- Variable Weights ---")
-weights = pd.DataFrame({
-    'Variable': features,
-    'Weight': model.coef_[0]
-}).sort_values('Weight', ascending=False)
-print(weights.to_string(index=False))
-
-# Amanda and West prediction data
-test_data = {
-    'cast_member': ['Amanda', 'West'],
-    'trigger_timing_encoded': [3, 3],
-    'confirmed': [0, 0],
-    'cast_reaction': [2, 2],
-    'betrayal_index': [10, 6],
-    'narrative_equity': [10, 8],
-    'victim_narrative_index': [10, 3],
-    'prior_incident': [0, 1],
-    'gender': [0, 1]
-}
-
-test_df = pd.DataFrame(test_data)
-predictions = model.predict_proba(test_df[features])
-
-print("\n--- Predictions ---")
-for i, name in enumerate(['Amanda', 'West']):
-    print(f"{name} — Exit probability: {predictions[i][1]:.1%}")
-
-# Without victim narrative
-features_no_victim = ['trigger_timing_encoded', 'confirmed', 'cast_reaction',
-                      'betrayal_index', 'narrative_equity',
-                      'prior_incident', 'gender']
-
-model_no_victim = LogisticRegression()
-model_no_victim.fit(df[features_no_victim], df['outcome'])
-
-test_no_victim = pd.DataFrame([{
-    'trigger_timing_encoded': 3,
-    'confirmed': 0,
-    'cast_reaction': 2,
-    'betrayal_index': 10,
-    'narrative_equity': 10,
-    'prior_incident': 0,
-    'gender': 0
-},
-{
-    'trigger_timing_encoded': 3,
-    'confirmed': 0,
-    'cast_reaction': 2,
-    'betrayal_index': 6,
-    'narrative_equity': 8,
-    'prior_incident': 1,
-    'gender': 1
-}])
-
-preds_no_victim = model_no_victim.predict_proba(test_no_victim[features_no_victim])
-
-print("\n--- Without Victim Narrative Variable ---")
-for i, name in enumerate(['Amanda', 'West']):
-    print(f"{name} — Exit probability: {preds_no_victim[i][1]:.1%}")
-print(f"\nGap without victim narrative: {abs(preds_no_victim[0][1] - preds_no_victim[1][1]):.1%}")
-
-# Without betrayal index
-features_no_betrayal = ['trigger_timing_encoded', 'confirmed', 'cast_reaction',
-                        'narrative_equity', 'victim_narrative_index',
-                        'prior_incident', 'gender']
-
-model_no_betrayal = LogisticRegression()
-model_no_betrayal.fit(df[features_no_betrayal], df['outcome'])
-
-test_no_betrayal = pd.DataFrame([{
-    'trigger_timing_encoded': 3,
-    'confirmed': 0,
-    'cast_reaction': 2,
-    'narrative_equity': 10,
-    'victim_narrative_index': 10,
-    'prior_incident': 0,
-    'gender': 0
-},
-{
-    'trigger_timing_encoded': 3,
-    'confirmed': 0,
-    'cast_reaction': 2,
-    'narrative_equity': 8,
-    'victim_narrative_index': 3,
-    'prior_incident': 1,
-    'gender': 1
-}])
-
-preds_no_betrayal = model_no_betrayal.predict_proba(test_no_betrayal[features_no_betrayal])
-
-print("\n--- Without Betrayal Index Variable ---")
-for i, name in enumerate(['Amanda', 'West']):
-    print(f"{name} — Exit probability: {preds_no_betrayal[i][1]:.1%}")
-print(f"\nGap without betrayal index: {abs(preds_no_betrayal[0][1] - preds_no_betrayal[1][1]):.1%}")
-
-# Without gender
-features_no_gender = ['trigger_timing_encoded', 'confirmed', 'cast_reaction',
-                      'betrayal_index', 'narrative_equity', 'victim_narrative_index',
-                      'prior_incident']
-
-model_no_gender = LogisticRegression()
-model_no_gender.fit(df[features_no_gender], df['outcome'])
-
-test_no_gender = pd.DataFrame([{
-    'trigger_timing_encoded': 3,
-    'confirmed': 0,
-    'cast_reaction': 2,
-    'betrayal_index': 10,
-    'narrative_equity': 10,
-    'victim_narrative_index': 10,
-    'prior_incident': 0
-},
-{
-    'trigger_timing_encoded': 3,
-    'confirmed': 0,
-    'cast_reaction': 2,
-    'betrayal_index': 6,
-    'narrative_equity': 8,
-    'victim_narrative_index': 3,
-    'prior_incident': 1
-}])
-
-preds_no_gender = model_no_gender.predict_proba(test_no_gender[features_no_gender])
-
-print("\n--- Without Gender Variable ---")
-for i, name in enumerate(['Amanda', 'West']):
-    print(f"{name} — Exit probability: {preds_no_gender[i][1]:.1%}")
-print(f"\nGap without gender: {abs(preds_no_gender[0][1] - preds_no_gender[1][1]):.1%}")
-
-# Summary
-print("\n--- Summary: Gap Under Each Condition ---")
-full_gap = abs(predictions[0][1] - predictions[1][1])
-print(f"Full model (all variables):     {full_gap:.1%}")
-print(f"Without gender:                 {abs(preds_no_gender[0][1] - preds_no_gender[1][1]):.1%}")
-print(f"Without betrayal index:         {abs(preds_no_betrayal[0][1] - preds_no_betrayal[1][1]):.1%}")
-print(f"Without victim narrative:       {abs(preds_no_victim[0][1] - preds_no_victim[1][1]):.1%}")
